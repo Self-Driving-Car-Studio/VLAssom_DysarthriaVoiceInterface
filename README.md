@@ -1,4 +1,4 @@
-# 🦾 VLAssom DysarthriaVoice Interface
+# 🦾 VLAssom Dysarthria Voice Interface
 > **Personalized Speech Recognition for Dysarthria Patients** > 구음장애 환자를 위한 맞춤형 음성 인식 및 로봇 제어 인터페이스
 
 ## 📖 프로젝트 소개 (Project Overview)
