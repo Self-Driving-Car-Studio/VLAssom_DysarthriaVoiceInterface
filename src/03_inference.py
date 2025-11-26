@@ -43,12 +43,12 @@ def robot_action(text):
     """인식된 텍스트에 따라 로봇 동작을 결정하는 함수"""
     print(f"\n🤖 [인식 결과]: '{text}'")
     
-    if "물" in text and "줘" in text:
-        print("   └─ 🦾 동작: 로봇 팔이 물컵을 잡아서 가져옵니다.")
-    elif "멈춰" in text:
-        print("   └─ 🛑 동작: 모든 모터를 긴급 정지합니다.")
-    elif "컵" in text and "집어" in text:
-        print("   └─ ✊ 동작: 그리퍼(Gripper)를 닫아 컵을 잡습니다.")
+    if "비타민" in text and "줘" in text:
+        print("   └─ 🦾 동작: VLAssom이 비타민을 잡아서 가져옵니다.")
+    elif "타이레놀" in text and "줘" in text :
+        print("   └─ 🦾 동작: VLAssom이 타이레놀을 잡아서 가져옵니다.")
+    elif "연필" in text and "줘" in text:
+        print("   └─ 🦾 동작: VLAssom이 연필을 잡아서 가져옵니다.")
     else:
         print("   └─ ❓ 동작: (정의되지 않은 명령어입니다)")
 
@@ -63,7 +63,7 @@ def transcribe_audio(audio_data):
 
     # 2. 추론 (생성)
     with torch.no_grad():
-        generated_ids = model.generate(input_features, language="kor")
+        generated_ids = model.generate(input_features, language="korean")
 
     # 3. 디코딩 (숫자 -> 글자)
     transcription = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]

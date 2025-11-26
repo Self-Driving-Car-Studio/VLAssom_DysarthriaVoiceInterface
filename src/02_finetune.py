@@ -12,6 +12,8 @@ from transformers import (
     Seq2SeqTrainer,
 )
 from peft import LoraConfig, get_peft_model, TaskType
+import torch
+
 
 # ==========================================
 # ⚙️ 설정 (내 환경에 맞게 수정)
@@ -103,6 +105,9 @@ data_collator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
 print(f"🤖 모델 로드 중... ({MODEL_ID})")
 model = WhisperForConditionalGeneration.from_pretrained(MODEL_ID, device_map="auto")
 
+model.gradient_checkpointing_enable()
+model.enable_input_require_grads()
+
 # LoRA 설정 (모델 전체를 학습하지 않고 일부만 학습 -> 빠름)
 config = LoraConfig(
     r=32, 
@@ -110,11 +115,14 @@ config = LoraConfig(
     target_modules=["q_proj", "v_proj"], 
     lora_dropout=0.05, 
     bias="none",
-    task_type=TaskType.SEQ_2_SEQ_LM
+    # task_type=TaskType.SEQ_2_SEQ_LM
 )
 
 model = get_peft_model(model, config)
+model.config.use_cache = False
 model.print_trainable_parameters() # 학습 가능한 파라미터 수 출력
+
+
 
 # ==========================================
 # 5. 학습 시작
@@ -127,20 +135,22 @@ training_args = Seq2SeqTrainingArguments(
     max_steps=MAX_STEPS,
     gradient_checkpointing=True,
     fp16=True, # GPU 지원 시 True, 아니면 False
-    evaluation_strategy="no", # 시간 절약을 위해 평가 생략
+    report_to="none",
+    eval_strategy="no", # 시간 절약을 위해 평가 생략
     save_strategy="steps",
     save_steps=100,
     logging_steps=25,
-    report_to=["tensorboard"],
     load_best_model_at_end=False,
 )
+
+data_collator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
 
 trainer = Seq2SeqTrainer(
     args=training_args,
     model=model,
     train_dataset=dataset,
     data_collator=data_collator,
-    tokenizer=processor.feature_extractor,
+    # tokenizer=processor.feature_extractor,
 )
 
 print("\n🚀 학습 시작! (잠시만 기다려주세요...)")
